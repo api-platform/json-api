@@ -34,10 +34,10 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use Doctrine\Common\Collections\ArrayCollection;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\HttpFoundation\EventStreamResponse;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -51,6 +51,7 @@ use Symfony\Component\TypeInfo\Type;
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
+#[IgnoreDeprecations]
 class ItemNormalizerTest extends TestCase
 {
     use ProphecyTrait;
@@ -216,11 +217,9 @@ class ItemNormalizerTest extends TestCase
 
         $normalizer->setSerializer($this->prophesize(SerializerInterface::class)->reveal());
 
-        // Symfony >= 7.3
-        $splObject = class_exists(EventStreamResponse::class) ? spl_object_id($circularReferenceEntity) : spl_object_hash($circularReferenceEntity);
         $context = [
             'circular_reference_limit' => 2,
-            'circular_reference_limit_counters' => [$splObject => 2],
+            'circular_reference_limit_counters' => [spl_object_id($circularReferenceEntity) => 2],
             'cache_error' => static function (): void {},
         ];
 
